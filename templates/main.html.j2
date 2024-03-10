@@ -1,0 +1,165 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NYX #dohrano {{ year_current }}</title>
+  <link rel="stylesheet" href="css/style.css">
+  <meta name="description" content="">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.png">
+
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#fafafa">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+small {
+    font-size: 0.75rem;
+}
+a {
+    color: #000 !important;
+}
+.nav {
+    background-color: #87937b;
+}
+.nav li {
+    background-color: #617e6a;
+    border: solid 1px #35443a;
+}
+.nav li.active {
+    background-color: #87937b;
+    border: 1px solid #545c4c;
+}
+.nav a {
+   color: #fff !important;
+}
+table {
+    width: 100%;
+    border-collapse: separate;
+}
+th {
+    background-color: #617E6A;
+    color: white;
+    text-align: left;
+    padding: 5px;
+}
+tr.main {
+    background-color: #cccdb1;
+    cursor: pointer;
+}
+td {
+    padding: 5px;
+}
+.sub td {
+    padding-left: 2px;
+}
+td.icon {
+    width: 40px;
+    height: 50px;
+    padding: 0;
+}
+td.bar {
+    width: 100%;
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcua77PwAGzQLjAel5zQAAAABJRU5ErkJggg==);
+    background-repeat: no-repeat;
+}
+tr.sub {
+    display: none;
+}
+tr.sub .bar {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mO8erH3PwAH6gM0UWhD9AAAAABJRU5ErkJggg==);
+}
+tr.even {
+    background-color: #f7f7f7;
+}
+</style>
+
+</head>
+
+<body>
+<main>
+  <div class="container-xxl bd-gutter">
+    <div class="row">
+      <div class="col-md-6 offset-md-3 mt-3 gap-3 text-center">
+<ul class="nav">
+{% for year in years %}
+  <li class="nav-item {% if year == year_current %}active{% endif %}">
+    <a class="nav-link" href="{{ year }}.html">{{ year }}</a>
+  </li>
+{% endfor %}
+</ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 offset-md-3 mt-3 gap-3 text-center">
+        <h1>NYX #dohrano {{ year_current }}</h1>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 offset-md-3 mt-3 mb-3 d-flex gap-3">
+<table>
+    <tr>
+        <th></th>
+        <th>ID</th>
+        <th>Hodiny</th>
+        <th>Hry</th>
+        <th></th>
+    </tr>
+{% for username, data in summary.items() %}
+    {% set bar_width = (data.playtime / (max_playtime / 100)) | round if max_playtime > 0 else 0 %}
+    <tr id="main-{{ username }}" class="main" data-username="{{ username }}">
+        <td class="icon"><img src="https://nyx.cz/{{ username[:1] }}/{{ username }}.gif"></td>
+        <td class="bar" style="background-size: {{ bar_width }}% 100%;">{{ username }}</td>
+        <td>{{ data.playtime }}</td>
+        <td>{{ data.count }}</td>
+        <td class="arrow"><i class="bi bi-caret-right-fill"></i></td>
+    </tr>
+    {% for game in data.games %}
+        {% set bar_width = (game.playtime / (data.playtime / 100)) | int if data.playtime > 0 else 0 %}
+        <tr class="sub sub-{{ username }} {% if loop.index % 2 == 0 %}even{% endif %}">
+            <td><small>{{ game.date }}</small></td>
+            <td class="bar" style="background-size: {% if bar_width %}{{ bar_width }}%{% else %}1px{% endif %} 100%;">{{ game.name }}</td>
+            <td>{{ game.playtime }}</td>
+            <td></td>
+            <td><a href="{{ game.url }}" target="_blank"><i class="bi bi-info-square"></i></a></td>
+        </tr>
+    {% endfor %}
+{% endfor %}
+</table>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 offset-md-3 mb-3 gap-3 text-center">
+        <p>Vygenerováno {{ generated_at }}</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="js/app.js"></script>
+<script>
+$(document).ready(function() {
+    $("tr.main").click(function(event) {
+        event.preventDefault();
+        var username = $(this).data("username");
+        $("tr.sub-" + username).toggle();
+        $(this).find(".arrow i").toggleClass("bi-caret-right-fill bi-caret-down-fill");
+    });
+});
+</script>
+
+</body>
+</html>

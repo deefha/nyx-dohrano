@@ -1,0 +1,26 @@
+---
+nyx:
+  api_url: https://nyx.cz/api/discussion
+  discussion_id: 25290
+  post_url: https://nyx.cz/discussion/{discussion_id}/id/{post_id}
+  query_base: text=%23dohrano
+  query_previous: "&from_id={from_id}&order=older_than"
+data:
+  dir: data
+  source: "{year}_source.yaml"
+  summary: "{year}_summary.yaml"
+  errors: "{year}_errors.yaml"
+output:
+  dir: output
+  year: "{year}.html"
+source:
+  dir: source
+  fixlist: fixlist.yaml
+  skiplist: skiplist.yaml
+templates:
+  dir: templates
+  main: "main.html.j2"
+playtime_max: 500
+years:
+  - 2024
+  - 2023
