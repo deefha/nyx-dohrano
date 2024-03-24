@@ -92,9 +92,9 @@ def get_source_parts(text):
     if text is None:
         return None
 
-    # split text into parts by slashes or pipes, trim whitespaces
+    # split text into parts by pipes, backslashes or slashes (by default), trim whitespaces
     # remove #dohrano or #dohráno from parts
-    separator = "/" if "/" in text else "|"
+    separator = "|" if "|" in text else "\\" if "\\" in text else "/"
     parts = [
         part.replace("#dohrano", "").replace("#dohráno", "").strip()
         for part in text.split(separator)
