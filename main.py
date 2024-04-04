@@ -175,6 +175,7 @@ def convert_parts_to_data(parts):
     return data
 
 
+# TODO: refactor this to a universal function for extralist and fixlist
 def convert_extra_to_data(extra):
     data = []
 
