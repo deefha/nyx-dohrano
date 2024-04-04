@@ -274,6 +274,14 @@ def main():
     # TODO: refactor this to a function
     # iterate over extralist and append data to data_source_by_username
     for extra in extralist:
+        # if inserted_at of the post is lower than date_min or higher than date_max, skip the post
+        post_inserted_at = datetime.fromisoformat(extra.inserted_at).replace(
+            tzinfo=timezone.utc
+        )
+        if post_inserted_at < date_min or post_inserted_at > date_max:
+            logger.info(f"Skipping extra post {extra.id} (not in date range)")
+            continue
+
         logger.info(f"Added extra post {extra.id}")
 
         source_data = convert_extra_to_data(extra)
