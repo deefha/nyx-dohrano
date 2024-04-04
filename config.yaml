@@ -15,6 +15,7 @@ output:
   year: "{year}.html"
 source:
   dir: source
+  extralist: extralist.yaml
   fixlist: fixlist.yaml
   skiplist: skiplist.yaml
 templates:
