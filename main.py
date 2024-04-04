@@ -20,6 +20,7 @@ except FileNotFoundError:
     exit(1)
 
 # set file constants
+SOURCE_EXTRALIST_FILE = os.path.join(config.source.dir, config.source.extralist)
 SOURCE_FIXLIST_FILE = os.path.join(config.source.dir, config.source.fixlist)
 SOURCE_SKIPLIST_FILE = os.path.join(config.source.dir, config.source.skiplist)
 DATA_SOURCE_FILE = os.path.join(config.data.dir, config.data.source)
@@ -174,6 +175,23 @@ def convert_parts_to_data(parts):
     return data
 
 
+def convert_extra_to_data(extra):
+    data = []
+
+    # iterate through the extra and create a data structure
+    for field in ["id", "username", "inserted_at", "game", "platform", "playtime"]:
+        if field in extra:
+            data.append(
+                {
+                    "type": field,
+                    "original": "",
+                    "value": extra[field],
+                }
+            )
+
+    return data
+
+
 def convert_fix_to_data(fix):
     data = []
 
@@ -224,6 +242,13 @@ def main():
     data_errors_file = DATA_ERRORS_FILE.format(year=args.year)
     output_year_file = OUTPUT_YEAR_FILE.format(year=args.year)
 
+    # load extralist from YAML file into Munch object, use emtpy list if the file is not found
+    try:
+        with open(SOURCE_EXTRALIST_FILE, "r") as file:
+            extralist = munchify(yaml.safe_load(file))
+    except FileNotFoundError:
+        extralist = []
+
     # load fixlist from YAML file into Munch object, use emtpy list if the file is not found
     try:
         with open(SOURCE_FIXLIST_FILE, "r") as file:
@@ -245,11 +270,42 @@ def main():
     data_summary_by_username = {}
     data_errors = []
 
+    # TODO: refactor this to a function
+    # iterate over extralist and append data to data_source_by_username
+    for extra in extralist:
+        logger.info(f"Added extra post {extra.id}")
+
+        source_data = convert_extra_to_data(extra)
+        status = get_status(source_data)
+
+        data = {
+            "id": extra.id,
+            "status": status,
+            "url": config.nyx.post_url.format(
+                discussion_id=config.nyx.discussion_id, post_id=extra.id
+            ),
+            "username": extra.username,
+            "inserted_at": extra.inserted_at,
+            "content": "",
+            "source_line": "",
+            "source_parts": [],
+            "source_data": source_data,
+        }
+
+        if extra.username in data_source_by_username:
+            data_source_by_username[extra.username].append(data)
+        else:
+            data_source_by_username[extra.username] = [data]
+
+        if status != Status.OK:
+            data_errors.append(data)
+
     # fetch the first (newest) page of the discussion
     discussion = fetch_discussion()
 
     while True:
         for post in discussion["posts"]:
+            # TODO: refactor this to a function
             # if inserted_at of the post is lower than date_min or higher than date_max, skip the post
             post_inserted_at = datetime.fromisoformat(post["inserted_at"]).replace(
                 tzinfo=timezone.utc
