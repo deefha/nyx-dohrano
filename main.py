@@ -1,10 +1,12 @@
 import argparse
+import html
 import logging
 import os
 import re
 import unicodedata
 from datetime import datetime, timedelta, timezone
 
+import pytz
 import requests
 import yaml
 from bs4 import BeautifulSoup
@@ -18,6 +20,9 @@ try:
 except FileNotFoundError:
     print("Config file not found")
     exit(1)
+
+# set timezone constant
+TIMEZONE = pytz.timezone(config.timezone)
 
 # set file constants
 SOURCE_EXTRALIST_FILE = os.path.join(config.source.dir, config.source.extralist)
@@ -70,10 +75,15 @@ def fetch_discussion(from_id=None):
 
 
 def convert_html_to_plaintext(text):
+    # unescape HTML entities
+    text = html.unescape(text)
+
     # replace <br> with newlines
     text = text.replace("<br>", "\n")
+
     # remove all remaining HTML tags
     text = BeautifulSoup(text, "html.parser").get_text()
+
     # strip blank lines
     text = "\n".join([line for line in text.split("\n") if line.strip()])
 
@@ -228,8 +238,8 @@ def get_status(data):
 
 def main():
     # set the minimum and maximum date of the posts using datetime
-    date_min = datetime(args.year, 1, 1, tzinfo=timezone.utc)
-    date_max = datetime(args.year + 1, 1, 1, tzinfo=timezone.utc)
+    date_min = datetime(args.year, 1, 1, tzinfo=TIMEZONE)
+    date_max = datetime(args.year + 1, 1, 1, tzinfo=TIMEZONE)
     logger.info(f"Date range: {date_min} - {date_max}")
 
     # create the data and output directory if they doesn't exist
@@ -276,7 +286,7 @@ def main():
     for extra in extralist:
         # if inserted_at of the post is lower than date_min or higher than date_max, skip the post
         post_inserted_at = datetime.fromisoformat(extra.inserted_at).replace(
-            tzinfo=timezone.utc
+            tzinfo=TIMEZONE
         )
         if post_inserted_at < date_min or post_inserted_at > date_max:
             logger.info(f"Skipping extra post {extra.id} (not in date range)")
@@ -317,7 +327,7 @@ def main():
             # TODO: refactor this to a function
             # if inserted_at of the post is lower than date_min or higher than date_max, skip the post
             post_inserted_at = datetime.fromisoformat(post["inserted_at"]).replace(
-                tzinfo=timezone.utc
+                tzinfo=TIMEZONE
             )
             if post_inserted_at < date_min or post_inserted_at > date_max:
                 logger.info(f"Skipping post {post['id']} (not in date range)")
@@ -375,7 +385,7 @@ def main():
         # if inserted_at of the last_post is lower than date_min, break the loop
         last_post_inserted_at = datetime.fromisoformat(
             last_post["inserted_at"]
-        ).replace(tzinfo=timezone.utc)
+        ).replace(tzinfo=TIMEZONE)
         if last_post_inserted_at < date_min:
             break
 
@@ -392,9 +402,9 @@ def main():
     # and boolean value that indicates if the newest post is not older than one week
     data_newest_by_username = {
         username: datetime.fromisoformat(data[0]["inserted_at"]).replace(
-            tzinfo=timezone.utc
+            tzinfo=TIMEZONE
         )
-        > datetime.now(timezone.utc) - timedelta(days=config.newest_days)
+        > datetime.now(TIMEZONE) - timedelta(days=config.newest_days)
         for username, data in data_source_by_username.items()
     }
 
@@ -430,7 +440,7 @@ def main():
                         if part["type"] == "playtime"
                     ][0]["value"],
                     "date": datetime.fromisoformat(post["inserted_at"])
-                    .replace(tzinfo=timezone.utc)
+                    .replace(tzinfo=TIMEZONE)
                     .strftime("%-d.%-m."),
                     "url": post["url"],
                 }
@@ -487,7 +497,7 @@ def main():
         max_playtime=max(
             [summary["playtime"] for summary in data_summary_by_username.values()]
         ),
-        generated_at=datetime.now(timezone.utc).strftime("%-d.%-m.%Y @ %H:%M:%S %Z"),
+        generated_at=datetime.now(TIMEZONE).strftime("%-d.%-m.%Y @ %H:%M:%S"),
         years=config.years,
         year_current=args.year,
     )

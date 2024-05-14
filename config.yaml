@@ -23,6 +23,7 @@ templates:
   main: "main.html.j2"
 playtime_max: 500
 newest_days: 7
+timezone: Europe/Prague
 years:
   - 2024
   - 2023
