@@ -24,6 +24,7 @@ templates:
 playtime_max: 500
 newest_days: 7
 timezone: Europe/Prague
+base_url: https://static.freedomconnection.cz/nyx-dohrano
 years:
   - 2024
   - 2023
