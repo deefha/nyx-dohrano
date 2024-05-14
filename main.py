@@ -382,6 +382,12 @@ def main():
         # use the last_post id as the from_id for the next request
         discussion = fetch_discussion(from_id=last_post["id"])
 
+    # iterate over data_source_by_username and sort the data by inserted_at
+    for username, data in data_source_by_username.items():
+        data_source_by_username[username] = sorted(
+            data, key=lambda post: post["inserted_at"], reverse=True
+        )
+
     # iterate over data_source_by_username and create data_summary_by_username
     for username, data in data_source_by_username.items():
         # count the number of posts with status OK
