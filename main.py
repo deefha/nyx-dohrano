@@ -3,7 +3,7 @@ import logging
 import os
 import re
 import unicodedata
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import requests
 import yaml
@@ -388,6 +388,16 @@ def main():
             data, key=lambda post: post["inserted_at"], reverse=True
         )
 
+    # create a dictionary from data_source_by_username with username as key
+    # and boolean value that indicates if the newest post is not older than one week
+    data_newest_by_username = {
+        username: datetime.fromisoformat(data[0]["inserted_at"]).replace(
+            tzinfo=timezone.utc
+        )
+        > datetime.now(timezone.utc) - timedelta(days=config.newest_days)
+        for username, data in data_source_by_username.items()
+    }
+
     # iterate over data_source_by_username and create data_summary_by_username
     for username, data in data_source_by_username.items():
         # count the number of posts with status OK
@@ -473,6 +483,7 @@ def main():
     template = env.get_template(config.templates.main)
     html = template.render(
         summary=data_summary_by_username,
+        newest=data_newest_by_username,
         max_playtime=max(
             [summary["playtime"] for summary in data_summary_by_username.values()]
         ),

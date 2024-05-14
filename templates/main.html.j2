@@ -75,6 +75,10 @@ td.bar {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNcua77PwAGzQLjAel5zQAAAABJRU5ErkJggg==);
     background-repeat: no-repeat;
 }
+td.bar strong {
+    font-weight: normal;
+    color: #B60F0F;
+}
 tr.sub {
     display: none;
 }
@@ -121,7 +125,7 @@ tr.even {
     {% set bar_width = (data.playtime / (max_playtime / 100)) | round if max_playtime > 0 else 0 %}
     <tr id="main-{{ username }}" class="main" data-username="{{ username }}">
         <td class="icon"><img src="https://nyx.cz/{{ username[:1] }}/{{ username }}.gif"></td>
-        <td class="bar" style="background-size: {{ bar_width }}% 100%;">{{ username }}</td>
+        <td class="bar" style="background-size: {{ bar_width }}% 100%;">{{ username }}{% if newest[username] %} <strong>NOVÉ</strong>{% endif %}</td>
         <td>{{ data.playtime }}</td>
         <td>{{ data.count }}</td>
         <td class="arrow"><i class="bi bi-caret-right-fill"></i></td>
