@@ -500,6 +500,7 @@ def main():
         generated_at=datetime.now(TIMEZONE).strftime("%-d.%-m.%Y @ %H:%M:%S"),
         years=config.years,
         year_current=args.year,
+        base_url=config.base_url,
     )
 
     # save the rendered template as HTML file
