@@ -220,7 +220,10 @@ def convert_fix_to_data(fix):
     return data
 
 
-def get_status(data):
+def get_status(data, force=False):
+    if force:
+        return Status.OK
+
     if data is None:
         return Status.EMPTY_SOURCE
 
@@ -349,7 +352,7 @@ def main():
                 # if the post is in the fixlist, use the fixlist data
                 if post["id"] in fixlist_by_id:
                     source_data = convert_fix_to_data(fixlist_by_id[post["id"]])
-                    status = get_status(source_data)
+                    status = get_status(source_data, force=True)
 
             # log the status of the post
             logger.info(f"Post {post['id']} {status}")
