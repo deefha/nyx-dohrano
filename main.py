@@ -349,10 +349,12 @@ def main():
                 if post["id"] in skiplist:
                     logger.info(f"Skipping post {post['id']} (in skiplist)")
                     continue
-                # if the post is in the fixlist, use the fixlist data
-                if post["id"] in fixlist_by_id:
-                    source_data = convert_fix_to_data(fixlist_by_id[post["id"]])
-                    status = get_status(source_data, force=True)
+
+            # if the post is in the fixlist, use the fixlist data
+            if post["id"] in fixlist_by_id:
+                logger.info(f"Fixing post {post['id']} (in fixlist)")
+                source_data = convert_fix_to_data(fixlist_by_id[post["id"]])
+                status = get_status(source_data, force=True)
 
             # log the status of the post
             logger.info(f"Post {post['id']} {status}")
