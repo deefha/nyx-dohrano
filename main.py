@@ -182,6 +182,16 @@ def convert_parts_to_data(parts):
                         part["type"] = "platform"
                         pass
 
+    # if there is no platform in the data, set it to an empty string
+    if not any(part["type"] == "platform" for part in data):
+        data.append(
+            {
+                "type": "platform",
+                "original": "",
+                "value": "",
+            }
+        )
+
     return data
 
 
@@ -443,6 +453,11 @@ def main():
                         part
                         for part in post["source_data"]
                         if part["type"] == "playtime"
+                    ][0]["value"],
+                    "platform": [
+                        part
+                        for part in post["source_data"]
+                        if part["type"] == "platform"
                     ][0]["value"],
                     "date": datetime.fromisoformat(post["inserted_at"])
                     .replace(tzinfo=TIMEZONE)

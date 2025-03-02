@@ -129,7 +129,7 @@ tr.even {
         {% set bar_width = (game.playtime / (data.playtime / 100)) | int if data.playtime > 0 else 0 %}
         <tr class="sub sub-{{ username }} {% if loop.index % 2 == 0 %}even{% endif %}">
             <td><small>{{ game.date }}</small></td>
-            <td class="bar" style="background-size: {% if bar_width %}{{ bar_width }}%{% else %}1px{% endif %} 100%;">{{ game.name }}</td>
+            <td class="bar" style="background-size: {% if bar_width %}{{ bar_width }}%{% else %}1px{% endif %} 100%;">{{ game.name }}{% if game.platform %} <small>[{{ game.platform }}]</small></td>
             <td>{{ game.playtime }}</td>
             <td></td>
             <td><a href="{{ game.url }}" target="_blank"><i class="bi bi-info-square"></i></a></td>
