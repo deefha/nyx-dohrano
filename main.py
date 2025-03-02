@@ -4,7 +4,7 @@ import logging
 import os
 import re
 import unicodedata
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 import pytz
 import requests
@@ -139,7 +139,7 @@ def convert_parts_to_data(parts):
                 # there are various units
                 # unit might not be separated by a space
                 # (e.g. "5hod" "1h" "3 hodiny" "2,5 hod" "6.5h")
-                value = re.match("^(\d*[,\.]?\d*)", part).group(1)
+                value = re.match(r"^(\d*[,\.]?\d*)", part).group(1)
                 # replace comma with dot
                 value = value.replace(",", ".")
                 # try to convert value to an float
@@ -173,7 +173,7 @@ def convert_parts_to_data(parts):
             ):
                 for chunk in part["value"].split(" "):
                     try:
-                        value = re.match("^(\d*[,\.]?\d*)", chunk).group(1)
+                        value = re.match(r"^(\d*[,\.]?\d*)", chunk).group(1)
                         value = value.replace(",", ".")
                         part["type"] = "playtime"
                         part["value"] = float(value)
