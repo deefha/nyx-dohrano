@@ -353,12 +353,10 @@ def main():
             source_data = convert_parts_to_data(source_parts)
             status = get_status(source_data)
 
-            # if the status is not OK, decide what to do with the post
-            if status != Status.OK:
-                # if the post is in the skiplist, skip the post
-                if post["id"] in skiplist:
-                    logger.info(f"Skipping post {post['id']} (in skiplist)")
-                    continue
+            # if the post is in the skiplist, skip the post
+            if post["id"] in skiplist:
+                logger.info(f"Skipping post {post['id']} (in skiplist)")
+                continue
 
             # if the post is in the fixlist, use the fixlist data
             if post["id"] in fixlist_by_id:
